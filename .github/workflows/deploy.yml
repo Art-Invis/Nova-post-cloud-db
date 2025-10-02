@@ -1,0 +1,33 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Start ssh-agent and add private key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.VM_SSH_KEY }}  # Приватний ключ для доступу до EC2
+
+      - name: Add known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy: run remote deploy script
+        env:
+          SSH_USER: ${{ secrets.VM_USER }}       # Наприклад: ubuntu
+          SSH_HOST: ${{ secrets.VM_HOST }}       # IP EC2
+          SSH_PORT: ${{ secrets.VM_PORT }}       # Зазвичай 22
+        run: |
+          ssh -o BatchMode=yes -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "bash /home/ubuntu/nova-post-cloud-db/deploy.sh"
