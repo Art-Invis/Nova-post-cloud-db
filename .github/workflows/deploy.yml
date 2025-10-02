@@ -24,7 +24,7 @@ jobs:
           echo "${{ secrets.VM_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Deploy: run remote deploy script
+      - name: Deploy run remote deploy script
         env:
           SSH_USER: ${{ secrets.VM_USER }}       # Наприклад: ubuntu
           SSH_HOST: ${{ secrets.VM_HOST }}       # IP EC2
