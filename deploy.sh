@@ -10,7 +10,7 @@ git reset --hard origin/main
 # активуємо virtualenv
 source venv/bin/activate
 pip install --upgrade pip
-pip install -r app/nova-post-cloud-db/requirements.txt
+pip install -r app/tracking_project/requirements.txt
 deactivate
 
 # перезапускаємо сервіс
