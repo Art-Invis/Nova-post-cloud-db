@@ -12,32 +12,28 @@ from auth.routes.postmats_routes import postmats_blueprint
 from auth.routes.delivery_address_routes import delivery_address_blueprint
 from auth.routes.branches_senders_routes import branches_senders_blueprint
 from auth.routes.couriers_routes import couriers_blueprint
-from auth.routes.user_routes import user_blueprint  # ✅ новий маршрут користувачів
-from auth.service.user_service import UserService   # ✅ для перевірки токенів
+from auth.routes.user_routes import user_blueprint  
+from auth.service.user_service import UserService   
 
 load_dotenv()
 
 app = Flask(__name__)
 
-# ⚙️ Конфіг бази даних
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
     f"@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# 🔑 JWT конфігурація
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "supersecretjwtkey123")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 3600  # 1 година
 
 jwt = JWTManager(app)
 
-# 🔒 Перевірка відкликаних токенів (logout)
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
     return UserService.is_token_revoked(jwt_payload)
 
-# 💬 Swagger шаблон з BearerAuth
 swagger_template = {
     "swagger": "2.0",
     "info": {
@@ -88,14 +84,13 @@ def health():
     return {"status": "ok"}
 
 
-# 📦 Реєстрація блюпрінтів
 app.register_blueprint(operating_hours_blueprint)
 app.register_blueprint(receivers_blueprint)
 app.register_blueprint(postmats_blueprint)
 app.register_blueprint(delivery_address_blueprint)
 app.register_blueprint(branches_senders_blueprint)
 app.register_blueprint(couriers_blueprint)
-app.register_blueprint(user_blueprint)  # ✅ додано
+app.register_blueprint(user_blueprint)  
 
 
 if __name__ == '__main__':
